@@ -32,9 +32,7 @@ G4bool SensitiveDetector::ProcessHits(G4Step* aStep, G4TouchableHistory*){
   G4StepPoint* postPoint = aStep->GetPostStepPoint(); 
   G4ThreeVector P1 = prePoint ->GetPosition();
   G4ThreeVector P2 = postPoint->GetPosition();
-  //G4ThreeVector point = P1 + G4UniformRand()*(P2 - P1);
-  G4ThreeVector point = P1;  
-
+  G4ThreeVector point = P1 + G4UniformRand()*(P2 - P1);
 
   SdInformation sdInformation;
   sdInformation.energyDeposit = aStep->GetTotalEnergyDeposit();
