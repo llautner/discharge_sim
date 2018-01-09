@@ -9,8 +9,8 @@
 StepMax::StepMax (const G4String& processName) :   G4VDiscreteProcess(processName), stepLimit(110000000)    {
   SetProcessType(fGeneral);
   SetProcessSubType(401);
-//   stepLimit = 0.005 *CLHEP::mm;
-  stepLimit = 1*CLHEP::mm;
+  stepLimit = 0.005 *CLHEP::mm;
+//  stepLimit = 1*CLHEP::mm;
 
 }
 
