@@ -16,6 +16,7 @@ Detector::~Detector() {
 //____________________________________________________________________________________________________________________________________________________________
 void Detector::Create(G4LogicalVolume* mother){
   G4int detectorFlag = fInput->GetGasFlag().gasParameter;
+  float EMfieldFlag = fInput->GetDriftField();
   
   G4NistManager* nist = G4NistManager::Instance();
   
@@ -117,7 +118,7 @@ void Detector::Create(G4LogicalVolume* mother){
   // Definition of the electric field
   
   
-  fEMfield = new G4UniformElectricField(G4ThreeVector(0.0,0.0, -400.0*volt/cm));
+  fEMfield = new G4UniformElectricField(G4ThreeVector(0.0,0.0, -EMfieldFlag*volt/cm));
   
   // Create an equation of motion for this field
   fEquation = new G4EqMagElectricField(fEMfield); 

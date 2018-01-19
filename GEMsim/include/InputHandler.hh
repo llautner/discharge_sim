@@ -16,6 +16,8 @@ struct Output
   TString filename;
 };
 
+
+
 struct GasFlag
 {
   G4int gasParameter;
@@ -32,6 +34,7 @@ public:
   
   void Init(char** argv);
   
+  float GetDriftField() const {return driftField;}
   Bool_t UseVis(){return visualizationOn;};
   TRandom3* getTRandom(){return random;};  
   Output GetOutput(){return output;};
@@ -48,6 +51,7 @@ private:
   TRandom3* random;
   Bool_t visualizationOn;
   Output output;
+  float driftField;
   GasFlag gasFlag;
   GasFlag WmeanNeCO2N2;
   GasFlag WmeanNeCO2;
