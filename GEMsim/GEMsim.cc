@@ -17,7 +17,7 @@
 
 int main(int argc,char** argv)
 {
-  // [nEvents] [Visualisation VIS/ no visualization SIM] [Gas: 0 - Ne-CO2-N2 (90-10-5), 1 - Ne-CO2 (90-10), 2 - Ar-CO2 (90-10), 3 - Ar-CO2 (70-30)]
+  // [nEvents] [Visualisation VIS/ no visualization SIM] [Gas: 0 - Ne-CO2-N2 (90-10-5), 1 - Ne-CO2 (90-10), 2 - Ar-CO2 (90-10), 3 - Ar-CO2 (70-30)] [Drift field] 
   InputHandler* input = InputHandler::GetInstance();
   input->Init(argv);
   

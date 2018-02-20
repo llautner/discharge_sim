@@ -1,0 +1,5 @@
+README for gas coeffiecient files: Ar-CO2_90-10_fullv.dat and similar
+####################################################################################
+Drfit Field [V/cm]   vdrift [cm/us]          diffL                   diffT
+                     drift velocity   longitudinal diffusion   transversal diffusion
+
