@@ -6,6 +6,7 @@
 #include "TGraphErrors.h"
 #include "TF1.h"
 #include "TRandom3.h"
+#include "RandomRing.h"
 
 
 // ./qCrit [Qcrit] [gasFlag] [pitch] [tInt] [filename]
@@ -40,14 +41,16 @@ int main(int argc,char** argv){
   
   HitEvent *hitEvent = new HitEvent();
   tree->SetBranchAddress("hitEvent", &hitEvent);
-  const float nev = tree->GetEntries();
+  const double nev = tree->GetEntries();
   
   //POLYA-DISTRIBUTION FOR THE GAIN FLUCTUATIONS
-  const float kappa = 1/(SigmaOverMu*SigmaOverMu);
-  const float s = 1/kappa;
-  const float theta = 1/SigmaOverMu -1;  
-  TF1 *fPolya = new TF1("Polya", Form("1/(TMath::Gamma(%e)*%e) *pow(x/%e, (%e)) *exp(-x/%e)", kappa, s, s, kappa-1, s), 0, 1000);
-  TRandom3 *rand = new TRandom3;
+  //const float kappa = 1/(SigmaOverMu*SigmaOverMu);
+  //const float s = 1/kappa;
+  //const float theta = 1/SigmaOverMu -1;  
+  //TF1 *fPolya = new TF1("Polya", Form("1/(TMath::Gamma(%e)*%e) *pow(x/%e, (%e)) *exp(-x/%e)", kappa, s, s, kappa-1, s), 0, 1000);
+  //TRandom3 *rand = new TRandom3;
+  
+  RandomRing random(10000000);
   
   //____________________________________________________________________________________________________________________________________________________________
   // Event loop  
@@ -81,21 +84,24 @@ int main(int argc,char** argv){
     for(Int_t ihit=0; ihit<int(hitEvent->GetNhit()); ++ihit){
       HoleHit *holeHit = (HoleHit*)hitEvent->GetHit()->UncheckedAt(ihit);
       
-      const float nEle = holeHit->GetNele();
+      const double nEle = holeHit->GetNele();
       const int readoutPos = int(holeHit->GetZPos());
       
       ++HitCounter[readoutPos];
           
       // gain fluctuations according to Polya distribution
-      const float gainFluct = fPolya->GetRandom();
+      //const float gainFluct = fPolya->GetRandom();
+      const double nEleFluct = (random.getNextValue() * std::sqrt(nEle)) + nEle;
       
       // fluctuations of critical charge according to measurements of the hole diameter (2.5 %) - enter quadratically - effective area of the hole -> charge density
-      const float QcritFluct = rand->Gaus(1., 0.025/2);
+      //const float QcritFluct = rand->Gaus(1., 0.025/2);
+      const double QcritFluct = (random.getNextValue() * 0.0125) + 1.;
       
       for(Int_t mult=0; mult<nMulti; ++mult){
-        const float totalCharge = nEle*multiplication[mult];
-        const float totalChargeFluct = nEle * multiplication[mult]/kappa * gainFluct * QcritFluct * QcritFluct;
-
+        const double totalCharge = nEle*multiplication[mult];
+//         const float totalChargeFluct = nEle * multiplication[mult]/kappa * gainFluct * QcritFluct * QcritFluct;
+        const double totalChargeFluct = nEleFluct * multiplication[mult] * QcritFluct * QcritFluct;
+        
         if(totalCharge > ClusterSize && noDoubleCount[readoutPos][mult] == 0){
           ++discharge[readoutPos][mult];
           noDoubleCount[readoutPos][mult] = 1;
@@ -133,8 +139,8 @@ int main(int argc,char** argv){
     if(HitCounter[int(readout[bin])] == 0) continue;
     grMultiplication[int(readout[bin])].SetTitle(Form("z=%.1f mm ;Multiplication;Discharge probability", float(int(readout[bin]))));
     for(Int_t mult=0; mult<nMulti; ++mult){
-      const float multi=multiplication[mult];
-      const float nDischM=discharge[int(readout[bin])][mult];
+      const double multi=multiplication[mult];
+      const double nDischM=discharge[int(readout[bin])][mult];
       grMultiplication[int(readout[bin])].SetPoint(i[bin], multi, nDischM/normalization);
       grMultiplication[int(readout[bin])].SetPointError(i[bin], 0, sqrt(nDischM/(normalization*normalization) + (nDischM*nDischM)/(normalization*normalization*normalization)));
       ++i[bin];
@@ -153,8 +159,8 @@ int main(int argc,char** argv){
     if(HitCounter[int(readout[bin])] == 0) continue;
     grMultiplicationFluct[int(readout[bin])].SetTitle(Form("z=%.1f mm (fluct);Multiplication;Discharge probability", float(int(readout[bin]))));
     for(Int_t mult=0; mult<nMulti; ++mult){
-      const float multi=multiplication[mult];
-      const float nDischMFluct=dischargeFluct[int(readout[bin])][mult];
+      const double multi=multiplication[mult];
+      const double nDischMFluct=dischargeFluct[int(readout[bin])][mult];
       grMultiplicationFluct[int(readout[bin])].SetPoint(mult, multi, nDischMFluct/normalization);
       grMultiplicationFluct[bin].SetPointError(mult, 0, sqrt(nDischMFluct/(normalization*normalization) + (nDischMFluct*nDischMFluct)/(normalization*normalization*normalization)));
       ++i[bin];
@@ -176,7 +182,7 @@ int main(int argc,char** argv){
     grRange[mult].SetTitle(Form("Multiplication=%.0f ;#it{d}_{source} [cm];Discharge probability", multiplication[mult]));
     for(int bin=0; bin<nSteps; ++bin){      
       if(HitCounter[int(readout[bin])] == 0) continue;
-      const float nDischR=discharge[int(readout[bin])][mult];
+      const double nDischR=discharge[int(readout[bin])][mult];
       grRange[mult].SetPoint(j[mult], (readout[bin]+1.5)/10., nDischR/normalization);
       grRange[mult].SetPointError(j[mult], 0, sqrt(nDischR/(normalization*normalization) + nDischR*nDischR/(normalization*normalization*normalization)));
       ++j[mult];
