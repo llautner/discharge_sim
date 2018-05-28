@@ -32,7 +32,7 @@ void Detector::Create(G4LogicalVolume* mother){
   G4Element* elAr = nist->FindOrBuildElement("Ar");
   G4Material *CO2 = nist->FindOrBuildMaterial("G4_CARBON_DIOXIDE");
   
-  G4double densityN2    = 1.1694*mg/cm3;
+  G4double densityN2    = 1.1694*mg/cm3; //1.1694 NTP default value
   G4Material* N2 = new G4Material(name="Nitrogen", densityN2, ncomponents=1);
   N2->AddElement(elN, natoms=2);
 
@@ -53,28 +53,28 @@ void Detector::Create(G4LogicalVolume* mother){
   //Detector gases
   
   // 90% Ar + 10% CO2, STP                                                                                                                                                                                         
-  density = 1.6689*mg/cm3 ;   //1.8036*mg/cm3 ;                                                                                                                                                                    
+  density = 1.6689*mg/cm3 ;   //NTP: 1.8036*mg/cm3, STP: 1.6689*mg/cm3 (STP default);                                                                                                                                                                    
   G4Material *Ar_90CO2_10 = new G4Material(name="ArCO2_9010", density, ncomponents=2, kStateGas,300*kelvin,1.*atmosphere);
   Ar_90CO2_10->AddElement(elAr, fractionmass = 0.891);
   Ar_90CO2_10->AddMaterial(CO2, fractionmass = 0.109);
   Ar_90CO2_10->GetIonisation()->SetMeanEnergyPerIonPair(fInput->GetGasFlag().WmeanAr_90CO2_10 *eV);
   
   // 70% Ar + 30% CO2, STP                                                                                                                                                                                         
-  density = 1.7067*mg/cm3 ;   //1.8391*mg/cm3 ;                                                                                                                                                                    
+  density = 1.7067*mg/cm3 ;   //NTP: 1.8391*mg/cm3, STP: 1.7067*mg/cm3(default);                                                                                                                                                                    
   G4Material *Ar_70CO2_30 = new G4Material(name="ArCO2_7030", density, ncomponents=2, kStateGas,300*kelvin,1.*atmosphere);
   Ar_70CO2_30->AddElement(elAr, fractionmass = 0.68);
   Ar_70CO2_30->AddMaterial(CO2, fractionmass = 0.32);
   Ar_70CO2_30->GetIonisation()->SetMeanEnergyPerIonPair(fInput->GetGasFlag().WmeanAr_70CO2_30 *eV);
   
   // ALICE mixture TPC_Ne-CO2                                                                                                                                                                                      
-  density = 0.93572*mg/cm3 ;
+  density = 0.93572*mg/cm3 ; //STP or NTP?
   G4Material *NeCO2 = new G4Material(name="NeCO2_9010", density, ncomponents=2, kStateGas,300*kelvin,1.*atmosphere);
   NeCO2->AddElement(elNe, fractionmass = 0.8035);
   NeCO2->AddMaterial(CO2, fractionmass = 0.1965);
   NeCO2->GetIonisation()->SetMeanEnergyPerIonPair(fInput->GetGasFlag().WmeanNeCO2 *eV);
   
   // ALICE upgrade mixture TPC_Ne-CO2-N2                                                                                                                                                                         
-  density = 0.94645*mg/cm3 ;
+  density = 0.94645*mg/cm3 ; //STP or NTP?
   G4Material *NeCO2N2 = new G4Material(name="NeCO2N2_90105", density, ncomponents=3, kStateGas,300*kelvin,1.*atmosphere);
   NeCO2N2->AddElement(elNe, fractionmass = 0.7565);
   NeCO2N2->AddMaterial(CO2, fractionmass = 0.1846);
@@ -82,6 +82,7 @@ void Detector::Create(G4LogicalVolume* mother){
   NeCO2N2->GetIonisation()->SetMeanEnergyPerIonPair(fInput->GetGasFlag().WmeanNeCO2N2 *eV);
   
   G4Material *detectorGas = NeCO2N2;
+  if(detectorFlag == 0) detectorGas = NeCO2N2;
   if(detectorFlag == 1) detectorGas = NeCO2;
   if(detectorFlag == 2) detectorGas = Ar_90CO2_10;
   if(detectorFlag == 3) detectorGas = Ar_70CO2_30;

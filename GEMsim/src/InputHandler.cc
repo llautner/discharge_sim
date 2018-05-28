@@ -37,6 +37,7 @@ void InputHandler::Init(char** argv)
   }
   
   TString gasAppendix = "Ne-CO2-N2_90-10-5";
+  if(gasFlag.gasParameter == 0) gasAppendix = "Ne-CO2-N2_90-10-5";
   if(gasFlag.gasParameter == 1) gasAppendix = "Ne-CO2_90-10";
   if(gasFlag.gasParameter == 2) gasAppendix = "Ar-CO2_90-10";
   if(gasFlag.gasParameter == 3) gasAppendix = "Ar-CO2_70-30";

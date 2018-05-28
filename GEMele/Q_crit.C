@@ -18,17 +18,18 @@ int main(int argc,char** argv){
   const char *filename = argv[5];
   const int field = atoi(argv[6]);  
 
-  //____________________________________________________________________________________________________________________________________________________________
-  // Initialize environment and parameters
+ //___________________________________________________________________________________________
+ // Initialize environment and parameters
       
-  //TODO: Sigma over Mu  values for Ar-based mixtures!
   const char *gas="Ne-CO2-N2_90-10-5";
   Double_t SigmaOverMu = 0.78;
+  if(gasFlag == 0) gas = "Ne-CO2-N2_90-10-5"; SigmaOverMu = 0.78;
   if(gasFlag == 1) gas = "Ne-CO2_90-10"; SigmaOverMu = 0.74;
   if(gasFlag == 2) gas = "Ar-CO2_90-10"; SigmaOverMu = 0.84; 
   if(gasFlag == 3) gas = "Ar-CO2_70-30"; SigmaOverMu = 0.84;
   
   const int nSteps = 100;
+
   const Int_t nMulti = 31;
   float multiplication[nMulti] = {275, 325., 375, 425., 475., 525., 575., 600., 625., 675., 725., 775., 825., 875., 925., 975., 1025., 1075., 1125., 1175., 1200., 1225., 1275., 1325., 1375., 1500, 1750, 2000., 3000., 4000., 5000.};
   const float readout[nSteps] = {10.f, 18.5f, 30.5f, 38.f};
@@ -52,7 +53,7 @@ int main(int argc,char** argv){
   
   RandomRing random(10000000);
   
-  //____________________________________________________________________________________________________________________________________________________________
+  //_____________________________________________________________________________________
   // Event loop  
   
   // reset variables
@@ -117,7 +118,7 @@ int main(int argc,char** argv){
   timerPost.Stop();
   timerPost.Print();
   
-  //____________________________________________________________________________________________________________________________________________________________
+  //_______________________________________________________________________________________________
   // Post-processing
  
   const char *directory = "~/Results";

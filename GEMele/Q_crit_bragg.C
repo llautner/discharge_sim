@@ -30,7 +30,7 @@ int main(int argc,char** argv){
   const int nSteps = 100;
   const Int_t nMulti = 31;
   float multiplication[nMulti] = {275, 325., 375, 425., 475., 525., 575., 600., 625., 675., 725., 775., 825., 875., 925., 975., 1025., 1075., 1125., 1175., 1200., 1225., 1275., 1325., 1375., 1500, 1750, 2000., 3000., 4000., 5000.};
-  const float readout[nSteps] = {2, 4, 6, 8, 10, 12, 13, 14, 16, 18, 20, 22, 23, 24, 26, 28, 30.5, 32, 34, 36, 38, 40, 42, 44, 46, 48, 49.7, 52, 54, 56, 58, 60, 62, 64, 66, 68, 70, 71, 73, 76, 79, 82};
+  const float readout[nSteps] = {10.f, 18.5f, 30.5f, 38.f};
   float HitCounter[nSteps];
   float discharge[nSteps][nMulti];
   float dischargeFluct[nSteps][nMulti];

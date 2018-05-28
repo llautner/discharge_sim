@@ -35,3 +35,9 @@ target_link_libraries(qCrit HitEvent)
 
 add_executable(qCrit_bragg Q_crit_bragg.C)
 target_link_libraries(qCrit_bragg HitEvent)
+
+add_executable(dEdx src/dEdx.cxx)
+target_link_libraries(dEdx GEMEvent)
+target_link_libraries(dEdx HitEvent)
+target_link_libraries(dEdx GEM)
+

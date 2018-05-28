@@ -36,7 +36,7 @@ fEmPhysicsList(0)
 //     fEmPhysicsList = new G4EmStandardPhysics_option4();
   
   G4LossTableManager::Instance();
-//   SetDefaultCutValue(1*mm);
+  SetDefaultCutValue(1*mm);
   
   //G4ProductionCutsTable::GetProductionCutsTable()->Set..
   

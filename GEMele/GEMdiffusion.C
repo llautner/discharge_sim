@@ -15,37 +15,34 @@
 #include "Riostream.h"
 #include <fstream>
 
-
-// ./GEMdiffusion  directory  gasFlag  tIntegration [ns]  pitch [um] nEvents field [V/cm] 
+// ./GEMdiffusion  directory  gasFlag  tIntegration [ns]  pitch [um] nEvents field [V/cm]
 
 int main(int argc,char** argv){
  
   const char *directory = argv[1];
-  const int gasFlag = atoi(argv[2]);                                                                                                                                         
+  const int gasFlag = atoi(argv[2]);      
   const float tIntegration = atof(argv[3]);
   const float pitch = atof(argv[4]);
   const int nEvents = atoi(argv[5]);
   const float field = atof(argv[6]);
- 
-  //____________________________________________________________________________________________________________________________________________________________
-  // Gas and detector parameters  
-  
+
+//_________________________________________________________________________________________________
+// Gas and detector parameters  
+
   const char *gasDirectory = "/home/ga24get";
-  const char *gas="Ne-CO2-N2_90-10-5";
   const char *gasFilename;
+  const char *gas="Ne-CO2-N2_90-10-5";
   float wIon = 37.3f; float diffL = 0.0218f; float diffT = 0.0223f; float vdrift = 2.52f;
-  
-  if(gasFlag ==2) {
-    
+
+  if(gasFlag == 1) {
     gas = "Ne-CO2_90-10";
     wIon = 38.1f;
     diffL = 0.0223f;
     diffT = 0.0219f;
-    vdrift = 2.66f;
+    vdrift = 2.66f; 
   }
-
+  
   if(gasFlag == 2) {
-
     gas = "Ar-CO2_90-10"; 
     wIon = 28.8f;
     diffL = 0.0244f;
@@ -61,14 +58,17 @@ int main(int argc,char** argv){
     vdrift = 0.932f;
   }
 
-  wIon /=1000000.f;
 
-//____________________________________________________________________________________________________________________________________
-//  Read file and set gas coeff
+//_________________________________________________________________________________________________
+//  Read file and set gas coeffients
 
-  gasFilename = Form("%s/%s_fullv.dat", gasDirectory, gas);
+  
+wIon /= 1000000.f;  // should be in MeV
 
-  std::ifstream fin(gasFilename);
+gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
+
+ std::ifstream fin(gasFilename);
+
   if(!fin) {
     std:cerr << "Unable to open " << gasFilename << endl;
   }
@@ -98,7 +98,7 @@ int main(int argc,char** argv){
     return 0;
   }
   fclose(gasdat);
- 
+
   const float zIntegration = vdrift * tIntegration * 1/100.f; // vdrift [cm/us], tIntegration [ns] and zIntegration [mm]
   
   const int nSteps = 4;
@@ -108,9 +108,10 @@ int main(int argc,char** argv){
   std::cout << "Initializing analysis for " << gas <<  "\n";
   std::cout << "GEM hole pitch: " << pitch << " um \n";
   std::cout << "Drift enabled - integration time " << tIntegration << " ns - drift distance " << zIntegration << " mm \n";
-  std::cout << "Drift velocity: " << vdrift << " longitudinal diffusion: " << diffL << " transversal diffusion: " << diffT << endl; 
-  //____________________________________________________________________________________________________________________________________________________________
-  // Input file
+  std::cout << "Drift field:" << field <<"Drift velocity: " << vdrift << " longitudinal diffusion: " << diffL << " transversal diffusion: " << diffT << endl; 
+
+ //_______________________________________________________________________________________________
+ // Input file
   
 
   const char *filename = Form("%s/output_%s_%s.root", directory, gas, argv[6]);
@@ -123,8 +124,8 @@ int main(int argc,char** argv){
   GEMEvent *event = new GEMEvent();
   tree->SetBranchAddress("GEMEvent", &event);
   
-  //____________________________________________________________________________________________________________________________________________________________
-  // Output file and processing classes
+//_____________________________________________________________________________________
+// Output file and processing classes
   
   const char *outfileName = Form("%s/GEMdiffusion_%s_%s_%s_%i.root", directory, gas, argv[6], argv[3], int(pitch));
   
@@ -139,7 +140,7 @@ int main(int argc,char** argv){
   
   RandomRing random(10000000);
   
-  //____________________________________________________________________________________________________________________________________________________________
+  //____________________________________________________________________________________________
   // Event loop
   
   TStopwatch timer;
