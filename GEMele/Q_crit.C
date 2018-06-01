@@ -8,7 +8,7 @@
 #include "TRandom3.h"
 #include "RandomRing.h"
 
-// ./qCrit [Qcrit] [gasFlag] [pitch] [tInt] [filename] [field]
+// ./qCrit [Qcrit] [gasFlag] [pitch] [tInt] [filename] [field] [collection efficiency]
 int main(int argc,char** argv){
 
   const int ClusterSize = atoi(argv[1]);
@@ -16,7 +16,8 @@ int main(int argc,char** argv){
   const int pitch = atoi(argv[3]);
   const char *tIntegration = argv[4];
   const char *filename = argv[5];
-  const int field = atoi(argv[6]);  
+  const int field = atoi(argv[6]); 
+  const double collEff = atof(argv[7]);
 
  //___________________________________________________________________________________________
  // Initialize environment and parameters
@@ -99,7 +100,10 @@ int main(int argc,char** argv){
       const double QcritFluct = (random.getNextValue() * 0.0125) + 1.;
       
       for(Int_t mult=0; mult<nMulti; ++mult){
-        const double totalCharge = nEle*multiplication[mult];
+	// const double totalCharge = nEle*multiplication[mult];
+	const double totalCharge = nEle*multiplication[mult]*collEff;
+
+
 //         const float totalChargeFluct = nEle * multiplication[mult]/kappa * gainFluct * QcritFluct * QcritFluct;
         const double totalChargeFluct = nEleFluct * multiplication[mult] * QcritFluct * QcritFluct;
         
@@ -122,7 +126,7 @@ int main(int argc,char** argv){
   // Post-processing
  
   const char *directory = "~/Results";
-  TFile *outFile = new TFile(Form("%s/simulation_%s_%s_%i_%i.root", directory, gas, tIntegration, field, int(ClusterSize)), "RECREATE");
+  TFile *outFile = new TFile(Form("%s/simulation_%s_%s_%i_%i_%i.root", directory, gas, tIntegration, field, int(collEff)*1000, int(ClusterSize)), "RECREATE");
 
   double normalization = nev;
 //   double multi, nDischM, nDischMFluct, nDischR;

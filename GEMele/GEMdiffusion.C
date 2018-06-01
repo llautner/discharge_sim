@@ -61,10 +61,11 @@ int main(int argc,char** argv){
 
 //_________________________________________________________________________________________________
 //  Read file and set gas coeffients
-
   
 wIon /= 1000000.f;  // should be in MeV
 
+
+/*
 gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
 
  std::ifstream fin(gasFilename);
@@ -98,7 +99,7 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
     return 0;
   }
   fclose(gasdat);
-
+*/
   const float zIntegration = vdrift * tIntegration * 1/100.f; // vdrift [cm/us], tIntegration [ns] and zIntegration [mm]
   
   const int nSteps = 4;
