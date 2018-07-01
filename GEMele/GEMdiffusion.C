@@ -14,17 +14,21 @@
 #include "TNtuple.h"
 #include "Riostream.h"
 #include <fstream>
+#include "TH1.h"
+#include "TH2.h"
+#include "TString.h"
 
-// ./GEMdiffusion  directory  gasFlag  tIntegration [ns]  pitch [um] nEvents field [V/cm]
+// ./GEMdiffusion  directory  gasFlag  tIntegration [ns]  pitch [um] nEvents field [V/cm] readoutSize
 
 int main(int argc,char** argv){
- 
+
   const char *directory = argv[1];
   const int gasFlag = atoi(argv[2]);      
   const float tIntegration = atof(argv[3]);
   const float pitch = atof(argv[4]);
   const int nEvents = atoi(argv[5]);
   const float field = atof(argv[6]);
+  const float readoutSize = atof(argv[7]);
 
 //_________________________________________________________________________________________________
 // Gas and detector parameters  
@@ -48,7 +52,8 @@ int main(int argc,char** argv){
     diffL = 0.0244f;
     diffT = 0.0268f;
     vdrift = 3.25f;
-  } 
+    
+   } 
 
   if(gasFlag == 3) {
     gas = "Ar_CO2_70-30";
@@ -65,8 +70,10 @@ int main(int argc,char** argv){
 wIon /= 1000000.f;  // should be in MeV
 
 
-/*
+
 gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
+
+
 
  std::ifstream fin(gasFilename);
 
@@ -99,7 +106,7 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
     return 0;
   }
   fclose(gasdat);
-*/
+
   const float zIntegration = vdrift * tIntegration * 1/100.f; // vdrift [cm/us], tIntegration [ns] and zIntegration [mm]
   
   const int nSteps = 4;
@@ -109,8 +116,8 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
   std::cout << "Initializing analysis for " << gas <<  "\n";
   std::cout << "GEM hole pitch: " << pitch << " um \n";
   std::cout << "Drift enabled - integration time " << tIntegration << " ns - drift distance " << zIntegration << " mm \n";
-  std::cout << "Drift field:" << field <<"Drift velocity: " << vdrift << " longitudinal diffusion: " << diffL << " transversal diffusion: " << diffT << endl; 
-
+  std::cout << "Drift field: " << field <<" Drift velocity: " << vdrift << " longitudinal diffusion: " << diffL << " transversal diffusion: " << diffT << " \n"; 
+  std::cout << "Readout size: " << readoutSize << " \n"<< endl; 
  //_______________________________________________________________________________________________
  // Input file
   
@@ -128,8 +135,8 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
 //_____________________________________________________________________________________
 // Output file and processing classes
   
-  const char *outfileName = Form("%s/GEMdiffusion_%s_%s_%s_%i.root", directory, gas, argv[6], argv[3], int(pitch));
-  
+  const char *outfileName = Form("%s/GEMdiffusion_%s_%s_%i_%s_%i.root", directory, gas, argv[6], int(readoutSize),argv[3], int(pitch));
+	
   TFile outfile(Form("%s", outfileName), "RECREATE");
   TTree out("HoleHits","Collection of all hits");
   
@@ -137,10 +144,16 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
   out.Branch("hitEvent", &hitEvent);
   out.BranchRef();
   
-  GEM gem(pitch, 100);
+  GEM gem(pitch, readoutSize);
   
   RandomRing random(10000000);
   
+  TH1F *hnele = new TH1F("hnele", "nele",500,-1,100);
+  TH1F *hz = new TH1F("hz", "z", 500,-1,100);
+  TH1F *deltaX = new TH1F("deltaX", "delta_diffX", 500,-2,2);
+  TH1F *deltaZ = new TH1F("deltaZ", "delta_diffZ", 500,-2,2);
+  //TH2F *znele_18 = new TH2F("znele_18", "nele vs z", 5000,0,50,5000,0,50);
+  TH2F *znele_18_V2 = new TH2F("znele_18_V2", "nele vs z", 5000,0,50,5000,0,50);
   //____________________________________________________________________________________________
   // Event loop
   
@@ -157,29 +170,44 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
     for(int ihit=0; ihit<event->GetNhit(); ++ihit){
       Hit *hit = (Hit*)event->GetHit()->UncheckedAt(ihit);
       const int nele = hit->GetEdep()/wIon;
+      hnele->Fill(nele);
       if(nele < 1) continue;
       const float hitX = hit->GetX() + 50.f;
       const float hitY = hit->GetY() + 50.f;
       const float hitZ = hit->GetZ() + 50.f;
-            
+      hz->Fill(hitZ);      
       for(int zStep = 0; zStep<nSteps; ++zStep){
         const float readoutPos = readout[zStep];
         const float sqrtDriftLength = std::sqrt((readoutPos-hitZ) * 0.1f);      // should be in cm
         const float sigmaT = sqrtDriftLength*diffT*10.f;                        // transform back to mm
         const float sigmaL = sqrtDriftLength*diffL*10.f;                        // transform back to mm
+	//if(readoutPos == 1.8f){
+	//znele_18->Fill(hitZ,nele);
+	//}
         if(hitZ<readoutPos-zIntegration-3.f*sigmaL || hitZ>readoutPos+3.f*sigmaL || (readoutPos-hitZ) < 0.f ) continue;
         for(int ele=0; ele<nele; ++ele){
           //charge spread by diffusion
           const float diffX = (random.getNextValue() * sigmaT) + hitX;
           const float diffY = (random.getNextValue() * sigmaT) + hitY;
           const float diffZ = (random.getNextValue() * sigmaL) + hitZ;
-          
+          const float delta_diffX = hitX-diffX;
+	  const float delta_diffZ = hitZ-diffZ;
+	  deltaX->Fill(delta_diffX);
+	  deltaZ->Fill(delta_diffZ);
           if(diffZ < readoutPos-zIntegration || diffZ > readoutPos) continue;
           GEMhits[readoutPos][gem.GetPadID(diffX, diffY)] +=1;
+	  znele_18_V2->Fill(hitZ,nele);
         }
       }
     }
     
+    hnele->Write();
+    hz->Write();
+    deltaX->Write();
+    deltaZ->Write();
+    //znele_18->Write();
+    znele_18_V2->Write();
+
     // this loop does not affect the performance at all!!!
     //for(auto iterGEMpos = GEMhits.begin(); iterGEMpos != GEMhits.end(); ++iterGEMpos) {
     for(std::map <float, std::map<int, int> >::iterator iterGEMpos = GEMhits.begin(); iterGEMpos != GEMhits.end(); ++iterGEMpos) {

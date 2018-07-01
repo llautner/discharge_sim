@@ -8,7 +8,8 @@
 #include "TRandom3.h"
 #include "RandomRing.h"
 
-// ./qCrit [Qcrit] [gasFlag] [pitch] [tInt] [filename] [field] [collection efficiency]
+// ./qCrit [Qcrit] [gasFlag] [pitch] [tInt] [filename] [field] [readoutSize]
+
 int main(int argc,char** argv){
 
   const int ClusterSize = atoi(argv[1]);
@@ -17,7 +18,7 @@ int main(int argc,char** argv){
   const char *tIntegration = argv[4];
   const char *filename = argv[5];
   const int field = atoi(argv[6]); 
-  const double collEff = atof(argv[7]);
+  const float readoutSize = atof(argv[7]);
 
  //___________________________________________________________________________________________
  // Initialize environment and parameters
@@ -31,8 +32,8 @@ int main(int argc,char** argv){
   
   const int nSteps = 100;
 
-  const Int_t nMulti = 31;
-  float multiplication[nMulti] = {275, 325., 375, 425., 475., 525., 575., 600., 625., 675., 725., 775., 825., 875., 925., 975., 1025., 1075., 1125., 1175., 1200., 1225., 1275., 1325., 1375., 1500, 1750, 2000., 3000., 4000., 5000.};
+  const Int_t nMulti = 43;
+  float multiplication[nMulti] = {275., 325., 375, 425., 475., 525., 575., 600., 625., 675., 725., 775., 825., 875., 925., 947., 975., 980., 990., 1010., 1025., 1031., 1049., 1059., 1075., 1087., 1096., 1098., 1126., 1130., 1139., 1144., 1152., 1154., 1175., 1200., 1225., 1275., 1325., 1375., 1500, 1750, 2000.};
   const float readout[nSteps] = {10.f, 18.5f, 30.5f, 38.f};
   double HitCounter[nSteps];
   double discharge[nSteps][nMulti];
@@ -100,10 +101,8 @@ int main(int argc,char** argv){
       const double QcritFluct = (random.getNextValue() * 0.0125) + 1.;
       
       for(Int_t mult=0; mult<nMulti; ++mult){
-	// const double totalCharge = nEle*multiplication[mult];
-	const double totalCharge = nEle*multiplication[mult]*collEff;
-
-
+	const double totalCharge = nEle*multiplication[mult];
+       
 //         const float totalChargeFluct = nEle * multiplication[mult]/kappa * gainFluct * QcritFluct * QcritFluct;
         const double totalChargeFluct = nEleFluct * multiplication[mult] * QcritFluct * QcritFluct;
         
@@ -126,7 +125,7 @@ int main(int argc,char** argv){
   // Post-processing
  
   const char *directory = "~/Results";
-  TFile *outFile = new TFile(Form("%s/simulation_%s_%s_%i_%i_%i.root", directory, gas, tIntegration, field, int(collEff)*1000, int(ClusterSize)), "RECREATE");
+  TFile *outFile = new TFile(Form("%s/simulation_%s_%s_%i_%i_%i.root", directory, gas, tIntegration, field, int(readoutSize), int(ClusterSize)), "RECREATE");
 
   double normalization = nev;
 //   double multi, nDischM, nDischMFluct, nDischR;
