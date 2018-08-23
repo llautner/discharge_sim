@@ -25,6 +25,7 @@ struct GasFlag
   G4double WmeanNeCO2;
   G4double WmeanAr_90CO2_10;
   G4double WmeanAr_70CO2_30;
+  G4double WmeanAr_50CH4_50;
 };
 
 class InputHandler {
@@ -34,6 +35,7 @@ public:
   
   void Init(char** argv);
   
+  int GetPitch() const {return pitch;}
   float GetDriftField() const {return driftField;}
   Bool_t UseVis(){return visualizationOn;};
   TRandom3* getTRandom(){return random;};  
@@ -43,6 +45,7 @@ public:
   GasFlag GetWmeanNeCO2(){return WmeanNeCO2;};
   GasFlag GetWmeanAr_90CO2_10(){return WmeanAr_90CO2_10;};
   GasFlag GetWmeanAr_70CO2_30(){return WmeanAr_70CO2_30;};
+  GasFlag GetWmeanAr_50CH4_50(){return WmeanAr_50CH4_50;};
   
 private:
   InputHandler(void);
@@ -52,11 +55,13 @@ private:
   Bool_t visualizationOn;
   Output output;
   float driftField;
+  int pitch;
   GasFlag gasFlag;
   GasFlag WmeanNeCO2N2;
   GasFlag WmeanNeCO2;
   GasFlag WmeanAr_90CO2_10;
   GasFlag WmeanAr_70CO2_30;
+  GasFlag WmeanAr_50CH4_50;
 };
 
 #endif /* INPUTHANDLER_HH_ */

@@ -26,7 +26,8 @@ int main(int argc,char** argv){
   if(gasFlag == 1) gas = "Ne-CO2_90-10"; SigmaOverMu = 0.74;
   if(gasFlag == 2) gas = "Ar-CO2_90-10"; SigmaOverMu = 0.84; 
   if(gasFlag == 3) gas = "Ar-CO2_70-30"; SigmaOverMu = 0.84;
-  
+  if(gasFlag == 4) gas = "Ar-CH4_50-50"; SigmaOverMu = 0.84;
+
   const int nSteps = 100;
   const Int_t nMulti = 31;
   float multiplication[nMulti] = {275, 325., 375, 425., 475., 525., 575., 600., 625., 675., 725., 775., 825., 875., 925., 975., 1025., 1075., 1125., 1175., 1200., 1225., 1275., 1325., 1375., 1500, 1750, 2000., 3000., 4000., 5000.};

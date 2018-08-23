@@ -35,9 +35,14 @@ int main(int argc,char** argv)
   runManager->SetGun(primaryGenerator);
   WorldConstruction* worldConstruction = new WorldConstruction(input);
   runManager->SetGeometry(worldConstruction);
-    
+ 
+  if(input->GetPitch()==800){
+    G4cout << "*****" << " Mesh geometry activated " << "****" << G4endl;
+    G4cout << "*****" << " Pitch " << input->GetPitch() << " ****" << G4endl;
+  } 
+   
   runManager->Initialize();
-  
+ 
   if (input->UseVis()) {
     G4cout << "*************************************************************" << G4endl;
     G4cout << "Visualization enabled" << G4endl;

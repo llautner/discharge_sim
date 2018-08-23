@@ -9,6 +9,7 @@
 #include "G4Sphere.hh"
 #include "G4Box.hh"
 #include "G4Tubs.hh"
+#include "G4EllipticalTube.hh"
 #include "SensitiveDetector.hh"
 #include "G4UserLimits.hh"
 #include "G4SystemOfUnits.hh"
@@ -44,10 +45,14 @@ private:
         G4Box *ActiveVolumeBox;
         G4LogicalVolume *ActiveVolumeLog;
         G4Box *PCBBox;
+        G4Box *MeshBox;
         G4Tubs *cylinder;
+	G4EllipticalTube *ellipse;
         G4LogicalVolume *cylinderLog;
+	G4LogicalVolume *ellipseLog;
         G4SubtractionSolid *subtract;
         G4LogicalVolume *PCBLog;
+        G4LogicalVolume *MeshLog;
         SensitiveDetector* sensitiveDetector;
         
         G4UserLimits* fStepLimit;

@@ -4,7 +4,8 @@ set(CMAKE_CXX_FLAGS "-std=C++11 ${CMAKE_CXX_FLAGS}")
 project(discharge)
 
 list(APPEND CMAKE_PREFIX_PATH $ENV{ROOTSYS})
-set(CMAKE_MODULE_PATH $ENV{ROOTSYS}/etc/cmake)
+#For LRZ Linux Cluster: harcode FindROOT path:
+set(CMAKE_MODULE_PATH ~/etc/cmake)
 find_package(ROOT REQUIRED COMPONENTS MathCore RIO Hist Tree Net)
 include_directories(${ROOT_USE_FILE})
 
@@ -35,9 +36,3 @@ target_link_libraries(qCrit HitEvent)
 
 add_executable(qCrit_bragg Q_crit_bragg.C)
 target_link_libraries(qCrit_bragg HitEvent)
-
-add_executable(dEdx src/dEdx.cxx)
-target_link_libraries(dEdx GEMEvent)
-target_link_libraries(dEdx HitEvent)
-target_link_libraries(dEdx GEM)
-

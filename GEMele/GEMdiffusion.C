@@ -33,7 +33,7 @@ int main(int argc,char** argv){
 //_________________________________________________________________________________________________
 // Gas and detector parameters  
 
-  const char *gasDirectory = "/home/ga24get";
+  const char *gasDirectory = "/home/hpc/t2321/ga24get2";
   const char *gasFilename;
   const char *gas="Ne-CO2-N2_90-10-5";
   float wIon = 37.3f; float diffL = 0.0218f; float diffT = 0.0223f; float vdrift = 2.52f;
@@ -61,6 +61,14 @@ int main(int argc,char** argv){
     diffL = 0.0138f;
     diffT = 0.0145f;
     vdrift = 0.932f;
+  }
+
+  if(gasFlag == 4) {
+    gas = "Ar_CH4_50-50";
+    wIon = 27.f; // dummy values
+    diffL = 0.01f; // dummy values
+    diffT = 0.01f; // dummy values
+    vdrift = 0.9f; // dummy values
   }
 
 
@@ -109,8 +117,8 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
 
   const float zIntegration = vdrift * tIntegration * 1/100.f; // vdrift [cm/us], tIntegration [ns] and zIntegration [mm]
   
-  const int nSteps = 4;
-  const float readout[nSteps] = {10.f, 18.5f, 30.5f, 38.f};
+  const int nSteps = 6;
+  const float readout[nSteps] = {10.f, 18.5f, 30.5f, 35.5f, 36.f, 38.f};
    
   std::cout << "__________________________________________________________________________________________________\n";
   std::cout << "Initializing analysis for " << gas <<  "\n";
@@ -148,12 +156,12 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
   
   RandomRing random(10000000);
   
-  TH1F *hnele = new TH1F("hnele", "nele",500,-1,100);
-  TH1F *hz = new TH1F("hz", "z", 500,-1,100);
-  TH1F *deltaX = new TH1F("deltaX", "delta_diffX", 500,-2,2);
-  TH1F *deltaZ = new TH1F("deltaZ", "delta_diffZ", 500,-2,2);
+ // TH1F *hnele = new TH1F("hnele", "nele",500,-1,100);
+  //TH1F *hz = new TH1F("hz", "z", 500,-1,100);
+  //TH1F *deltaX = new TH1F("deltaX", "delta_diffX", 500,-2,2);
+  //TH1F *deltaZ = new TH1F("deltaZ", "delta_diffZ", 500,-2,2);
   //TH2F *znele_18 = new TH2F("znele_18", "nele vs z", 5000,0,50,5000,0,50);
-  TH2F *znele_18_V2 = new TH2F("znele_18_V2", "nele vs z", 5000,0,50,5000,0,50);
+ // TH2F *znele_18_V2 = new TH2F("znele_18_V2", "nele vs z", 5000,0,50,5000,0,50);
   //____________________________________________________________________________________________
   // Event loop
   
@@ -170,12 +178,12 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
     for(int ihit=0; ihit<event->GetNhit(); ++ihit){
       Hit *hit = (Hit*)event->GetHit()->UncheckedAt(ihit);
       const int nele = hit->GetEdep()/wIon;
-      hnele->Fill(nele);
+     // hnele->Fill(nele);
       if(nele < 1) continue;
       const float hitX = hit->GetX() + 50.f;
       const float hitY = hit->GetY() + 50.f;
       const float hitZ = hit->GetZ() + 50.f;
-      hz->Fill(hitZ);      
+     // hz->Fill(hitZ);      
       for(int zStep = 0; zStep<nSteps; ++zStep){
         const float readoutPos = readout[zStep];
         const float sqrtDriftLength = std::sqrt((readoutPos-hitZ) * 0.1f);      // should be in cm
@@ -190,23 +198,23 @@ gasFilename = Form("%s/%s_fullv.dat",gasDirectory, gas);
           const float diffX = (random.getNextValue() * sigmaT) + hitX;
           const float diffY = (random.getNextValue() * sigmaT) + hitY;
           const float diffZ = (random.getNextValue() * sigmaL) + hitZ;
-          const float delta_diffX = hitX-diffX;
-	  const float delta_diffZ = hitZ-diffZ;
-	  deltaX->Fill(delta_diffX);
-	  deltaZ->Fill(delta_diffZ);
+         // const float delta_diffX = hitX-diffX;
+	 // const float delta_diffZ = hitZ-diffZ;
+	 // deltaX->Fill(delta_diffX);
+	 // deltaZ->Fill(delta_diffZ);
           if(diffZ < readoutPos-zIntegration || diffZ > readoutPos) continue;
           GEMhits[readoutPos][gem.GetPadID(diffX, diffY)] +=1;
-	  znele_18_V2->Fill(hitZ,nele);
+	 // znele_18_V2->Fill(hitZ,nele);
         }
       }
     }
-    
-    hnele->Write();
-    hz->Write();
-    deltaX->Write();
-    deltaZ->Write();
+
+    //hnele->Write();
+    //hz->Write();
+    //deltaX->Write();
+    //deltaZ->Write();
     //znele_18->Write();
-    znele_18_V2->Write();
+    //znele_18_V2->Write();
 
     // this loop does not affect the performance at all!!!
     //for(auto iterGEMpos = GEMhits.begin(); iterGEMpos != GEMhits.end(); ++iterGEMpos) {

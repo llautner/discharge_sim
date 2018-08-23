@@ -29,9 +29,11 @@ InputHandler::~InputHandler() {
 void InputHandler::Init(char** argv)
 {
   int nev = G4UIcommand::ConvertToInt(argv[1]);
-  driftField = G4UIcommand::ConvertToDouble(argv[4]);
-  gasFlag.gasParameter = G4UIcommand::ConvertToInt(argv[3]);
   TString flag = argv[2];
+  gasFlag.gasParameter = G4UIcommand::ConvertToInt(argv[3]);
+  driftField = G4UIcommand::ConvertToDouble(argv[4]);
+  pitch = G4UIcommand::ConvertToInt(argv[5]);
+
   if(flag == "VIS"){
     visualizationOn = true;
   }
@@ -41,11 +43,13 @@ void InputHandler::Init(char** argv)
   if(gasFlag.gasParameter == 1) gasAppendix = "Ne-CO2_90-10";
   if(gasFlag.gasParameter == 2) gasAppendix = "Ar-CO2_90-10";
   if(gasFlag.gasParameter == 3) gasAppendix = "Ar-CO2_70-30";
+  if(gasFlag.gasParameter == 4) gasAppendix = "Ar-CH4_50-50";
   
   gasFlag.WmeanNeCO2N2 = 37.3;
   gasFlag.WmeanNeCO2 = 38.1;
   gasFlag.WmeanAr_90CO2_10 = 28.8;
   gasFlag.WmeanAr_70CO2_30 = 28.1;
+  gasFlag.WmeanAr_50CH4_50 = 27.; // dummy value
   
   output.filename = "output_" +  gasAppendix + "_" + argv[4] +".root"; 
   
